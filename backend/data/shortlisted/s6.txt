@@ -1,0 +1,4 @@
+AI engineer with practical experience in machine learning systems.
+Designed models for candidate screening and document analysis.
+Implemented text preprocessing and model evaluation techniques.
+Strong understanding of data structures and ML concepts.

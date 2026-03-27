@@ -1,0 +1,3 @@
+Administrative staff managing records and office supplies.
+Basic computer knowledge only.
+No experience in software development or data analysis.

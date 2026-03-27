@@ -1,0 +1,4 @@
+Data scientist with expertise in machine learning, deep learning, and NLP.
+Worked on text preprocessing, vectorization, and classification.
+Built resume screening systems using TF-IDF and logistic regression.
+Bachelor degree in computer science.

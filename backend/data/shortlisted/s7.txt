@@ -1,0 +1,4 @@
+Software engineer specialized in Python and machine learning.
+Built intelligent systems for resume screening using NLP.
+Deployed trained models using FastAPI and REST APIs.
+Background in computer science and applied mathematics.

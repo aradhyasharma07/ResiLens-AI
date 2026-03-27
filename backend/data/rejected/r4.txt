@@ -1,0 +1,3 @@
+Office assistant responsible for documentation and filing.
+Used MS Word and Excel for basic tasks.
+No programming or technical project experience.

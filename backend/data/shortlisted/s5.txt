@@ -1,0 +1,4 @@
+Python developer focused on artificial intelligence and data science.
+Created ML pipelines for text classification and resume analysis.
+Experience with pandas, NumPy, scikit-learn, and FastAPI.
+Strong academic background in engineering.

@@ -1,0 +1,4 @@
+Python developer with strong experience in machine learning, NLP, deep learning.
+Built ML models using scikit-learn and deployed using FastAPI.
+Worked on resume screening and text classification projects.
+Strong background in computer science and data structures.

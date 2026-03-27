@@ -1,0 +1,5 @@
+Skills: SQL, Python, Data Analysis
+Experience: Internship in analytics
+Projects: Data visualization and ML models
+Education: Computer Science
+Model evaluation
