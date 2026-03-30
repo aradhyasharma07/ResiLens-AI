@@ -1,2 +1,3 @@
 This project implements an intelligent resume screening system using machine learning and natural language processing. It involves extracting structured information from resumes, performing text preprocessing, generating numerical features through NLP techniques, and training classification models to evaluate candidate suitability.
+
 The system is designed to support automated resume filtering, ranking, and decision support. The development process includes data collection, preprocessing, feature engineering, model optimization, testing, and documentation, resulting in a scalable prototype for automated recruitment assistance.
