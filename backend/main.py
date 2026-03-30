@@ -5,10 +5,14 @@ import joblib
 import os
 import io
 import PyPDF2
+from pymongo import MongoClient
+from datetime import datetime
 
 app = FastAPI(title="ResiLens AI API")
 
-# CORS
+# -----------------------------
+# CORS CONFIG
+# -----------------------------
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:3000"],
@@ -17,28 +21,40 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# -----------------------------
+# DATABASE SETUP
+# -----------------------------
+client = MongoClient("mongodb://localhost:27017/")
+db = client["resilens"]
+collection = db["resumes"]
+
+# -----------------------------
+# LOAD MODEL
+# -----------------------------
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
 model = joblib.load(os.path.join(BASE_DIR, "model.pkl"))
 vectorizer = joblib.load(os.path.join(BASE_DIR, "vectorizer.pkl"))
 
-
+# -----------------------------
+# INPUT SCHEMA
+# -----------------------------
 class ResumeInput(BaseModel):
     text: str
 
-
+# -----------------------------
+# ROOT
+# -----------------------------
 @app.get("/")
 def root():
     return {"message": "ResiLens AI backend is running"}
 
-
 # -----------------------------
-# SHARED DECISION FUNCTION
+# CLASSIFICATION FUNCTION
 # -----------------------------
 def classify_resume(text: str):
     text_lower = text.lower()
 
-    # Hard reject keywords (rule-based guardrail)
     hard_reject_keywords = [
         "ms word", "excel", "office assistant", "clerk",
         "administrative", "sales", "retail", "arts"
@@ -46,20 +62,17 @@ def classify_resume(text: str):
 
     text_vector = vectorizer.transform([text])
     probabilities = model.predict_proba(text_vector)[0]
-    confidence = probabilities[1] * 100  # shortlisted probability
+    confidence = probabilities[1] * 100
 
-    # Rule-based override (industry practice)
     if any(word in text_lower for word in hard_reject_keywords):
         return "Rejected", round(min(confidence, 35), 2)
 
-    # Threshold-based decision
     if confidence >= 65:
         return "Shortlisted", round(confidence, 2)
     elif confidence >= 45:
         return "Needs Review", round(confidence, 2)
     else:
         return "Rejected", round(confidence, 2)
-
 
 # -----------------------------
 # TEXT INPUT ENDPOINT
@@ -68,21 +81,29 @@ def classify_resume(text: str):
 def predict_resume(data: ResumeInput):
     result, confidence = classify_resume(data.text)
 
+    # Save to DB
+    collection.insert_one({
+        "text": data.text,
+        "result": result,
+        "confidence": confidence,
+        "created_at": datetime.utcnow()
+    })
+
     return {
         "result": result,
         "confidence": confidence
     }
-
 
 # -----------------------------
 # FILE INPUT ENDPOINT
 # -----------------------------
 @app.post("/predict-file")
 async def predict_from_file(file: UploadFile = File(...)):
+
     if file.content_type not in ["application/pdf", "text/plain"]:
         return {"error": "Only PDF or TXT files are supported"}
 
-    # Read file
+    # Extract text
     if file.content_type == "application/pdf":
         pdf_reader = PyPDF2.PdfReader(io.BytesIO(await file.read()))
         text = ""
@@ -91,7 +112,17 @@ async def predict_from_file(file: UploadFile = File(...)):
     else:
         text = (await file.read()).decode("utf-8", errors="ignore")
 
+    # Prediction
     result, confidence = classify_resume(text)
+
+    # Save to DB
+    collection.insert_one({
+        "filename": file.filename,
+        "text": text,
+        "result": result,
+        "confidence": confidence,
+        "created_at": datetime.utcnow()
+    })
 
     return {
         "result": result,
@@ -134,9 +165,10 @@ async def predict_from_file(file: UploadFile = File(...)):
 
 
 
-
 # ______________________________________________________________________________________________________________________________________________
 
 
 # To run the app, use the command:
-# uvicorn backend.main:app --reload
+# first write cd backend in terminal to navigate to the backend directory, then run: uvicorn main:app --reload
+# then type cd frontend in another terminal and then type npm run dev to run the program
+# The backend will be running on http://localhost:8000 and the frontend on http://localhost:3000
