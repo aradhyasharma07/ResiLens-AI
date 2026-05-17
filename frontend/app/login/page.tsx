@@ -49,8 +49,8 @@ export default function LoginPage() {
     setLoading(true);
 
     const endpoint = isSignup
-      ? "http://127.0.0.1:8000/signup"
-      : "http://127.0.0.1:8000/login";
+      ? "https://resilens-ai-backend.onrender.com/signup"
+      : "https://resilens-ai-backend.onrender.com/login";
 
     const payload = isSignup
 
@@ -193,7 +193,7 @@ export default function LoginPage() {
           );
 
         await fetch(
-          "http://127.0.0.1:8000/google-login",
+          "https://resilens-ai-backend.onrender.com/google-login",
 
           {
             method: "POST",
