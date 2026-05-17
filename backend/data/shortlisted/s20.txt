@@ -1,0 +1,15 @@
+Kevin Walker
+Backend Engineer
+
+Skills:
+Python, Django, PostgreSQL, Docker
+
+Experience:
+Backend Developer Intern.
+
+Projects:
+Inventory API.
+Authentication Service.
+
+Education:
+Computer Science Engineering

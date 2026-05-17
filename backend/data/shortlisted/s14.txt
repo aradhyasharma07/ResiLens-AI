@@ -1,0 +1,15 @@
+Daniel Lee
+Cloud Engineer
+
+Skills:
+AWS, Docker, Kubernetes, Python
+
+Experience:
+Cloud Infrastructure Intern.
+
+Projects:
+Cloud monitoring dashboard.
+CI/CD deployment system.
+
+Education:
+B.Tech Information Technology

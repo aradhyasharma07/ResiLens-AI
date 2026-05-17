@@ -1,0 +1,15 @@
+Olivia Martinez
+Software Developer
+
+Skills:
+JavaScript, React, MongoDB, Node.js
+
+Experience:
+Worked on MERN stack applications.
+
+Projects:
+Hospital management system.
+Task tracking platform.
+
+Education:
+Computer Science Engineering

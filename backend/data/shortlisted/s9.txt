@@ -1,0 +1,17 @@
+Sarah Williams
+Full Stack Developer
+
+Skills:
+Python, FastAPI, MongoDB, Docker, AWS, React
+
+Experience:
+Software Engineer Intern at CloudStack.
+
+Projects:
+Created ML-based ATS system.
+Developed cloud deployment pipelines.
+
+Education:
+Bachelor of Engineering in Information Technology
+
+GitHub: github.com/sarahw

@@ -1,0 +1,15 @@
+Rachel Green
+Frontend Engineer
+
+Skills:
+React, Next.js, Tailwind CSS, JavaScript
+
+Experience:
+Frontend Intern at WebCore.
+
+Projects:
+Portfolio website.
+Chat application.
+
+Education:
+Bachelor of Engineering

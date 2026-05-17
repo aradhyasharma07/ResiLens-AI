@@ -1,0 +1,15 @@
+James Anderson
+AI/ML Developer
+
+Skills:
+Python, Machine Learning, NLP, TensorFlow
+
+Experience:
+ML Intern at AI Labs.
+
+Projects:
+Resume screening AI.
+Recommendation system.
+
+Education:
+Bachelor of Technology

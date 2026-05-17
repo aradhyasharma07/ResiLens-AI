@@ -1,0 +1,15 @@
+Michael Johnson
+Software Engineer
+
+Skills:
+Node.js, React, SQL, MongoDB, JavaScript
+
+Experience:
+Worked as backend developer for startup projects.
+
+Projects:
+Inventory management system.
+AI chatbot integration.
+
+Education:
+BSc Computer Science

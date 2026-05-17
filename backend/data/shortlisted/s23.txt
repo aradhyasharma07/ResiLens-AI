@@ -1,0 +1,15 @@
+Noah Clark
+MERN Stack Developer
+
+Skills:
+MongoDB, Express.js, React, Node.js
+
+Experience:
+Full Stack Developer Intern.
+
+Projects:
+Hospital Management App.
+Task Management Dashboard.
+
+Education:
+Bachelor in Computer Applications

@@ -1,0 +1,15 @@
+William Scott
+Software Engineer
+
+Skills:
+JavaScript, SQL, React, GitHub
+
+Experience:
+Software Development Intern.
+
+Projects:
+AI Recruiter Dashboard.
+Blogging Platform.
+
+Education:
+Computer Science

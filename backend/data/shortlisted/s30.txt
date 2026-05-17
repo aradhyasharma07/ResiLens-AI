@@ -1,0 +1,15 @@
+Mia King
+Frontend Engineer
+
+Skills:
+React, Next.js, Tailwind CSS, TypeScript
+
+Experience:
+Frontend Development Intern.
+
+Projects:
+Resume Screening UI.
+AI Chat Interface.
+
+Education:
+Bachelor of Engineering

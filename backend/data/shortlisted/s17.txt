@@ -1,0 +1,15 @@
+Emma Thomas
+Full Stack Engineer
+
+Skills:
+React, FastAPI, MongoDB, Docker, AWS
+
+Experience:
+Full Stack Developer Intern.
+
+Projects:
+AI recruiter platform.
+Analytics dashboard.
+
+Education:
+B.Tech Computer Engineering

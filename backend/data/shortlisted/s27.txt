@@ -1,0 +1,15 @@
+Benjamin Hall
+Backend Developer
+
+Skills:
+FastAPI, MongoDB, Docker, AWS
+
+Experience:
+Backend API Developer.
+
+Projects:
+Analytics API.
+Authentication Backend.
+
+Education:
+Bachelor of Technology

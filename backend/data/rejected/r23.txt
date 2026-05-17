@@ -1,0 +1,5 @@
+Data Structure Lecture
+
+Trees and graphs.
+Heap operations.
+Semester notes.

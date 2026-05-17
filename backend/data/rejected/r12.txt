@@ -1,0 +1,5 @@
+Operating System Assignment
+
+CPU scheduling algorithms.
+Deadlock prevention.
+Memory management notes.

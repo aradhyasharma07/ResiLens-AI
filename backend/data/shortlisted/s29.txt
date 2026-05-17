@@ -1,0 +1,15 @@
+Lucas White
+Software Engineer
+
+Skills:
+Python, SQL, Docker, GitHub
+
+Experience:
+Worked on scalable backend systems.
+
+Projects:
+Payment Gateway API.
+Attendance System.
+
+Education:
+Computer Engineering

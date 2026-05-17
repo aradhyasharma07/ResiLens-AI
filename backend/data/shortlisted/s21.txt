@@ -1,0 +1,15 @@
+Ava Roberts
+Machine Learning Engineer
+
+Skills:
+Python, TensorFlow, NLP, AI, FastAPI
+
+Experience:
+ML Research Intern.
+
+Projects:
+AI Chatbot.
+Resume Classification System.
+
+Education:
+M.Tech AI

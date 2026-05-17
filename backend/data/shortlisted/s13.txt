@@ -1,0 +1,15 @@
+Sophia Wilson
+Frontend Engineer
+
+Skills:
+React, Tailwind CSS, TypeScript, Next.js
+
+Experience:
+Frontend Developer Intern.
+
+Projects:
+Portfolio website.
+Real-time chat application.
+
+Education:
+Bachelor in Computer Applications

@@ -1,0 +1,15 @@
+Liam Harris
+Cloud Developer
+
+Skills:
+AWS, Docker, Kubernetes, Python
+
+Experience:
+Cloud Engineering Intern.
+
+Projects:
+Cloud Monitoring System.
+CI/CD Pipeline.
+
+Education:
+B.Tech IT

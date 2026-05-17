@@ -1,0 +1,15 @@
+David Brown
+Backend Developer
+
+Skills:
+Python, Django, PostgreSQL, Docker, AWS
+
+Experience:
+Backend Intern at DataSphere.
+
+Projects:
+REST APIs for analytics platform.
+Authentication system implementation.
+
+Education:
+B.Tech CSE

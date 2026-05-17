@@ -1,0 +1,6 @@
+Data Structures Notes
+
+Linked list explanation.
+Stack implementation.
+Queue operations.
+Semester exam preparation.

@@ -1,0 +1,15 @@
+Grace Lewis
+AI Developer
+
+Skills:
+Python, Machine Learning, TensorFlow, NLP
+
+Experience:
+AI Intern at ML Labs.
+
+Projects:
+Speech Recognition App.
+AI Screening System.
+
+Education:
+M.Tech Artificial Intelligence

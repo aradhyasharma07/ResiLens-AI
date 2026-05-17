@@ -1,0 +1,15 @@
+Sophia Adams
+Frontend Developer
+
+Skills:
+React, Tailwind CSS, TypeScript
+
+Experience:
+Worked on frontend UI development.
+
+Projects:
+E-commerce Website.
+Resume Builder Platform.
+
+Education:
+B.Tech Computer Engineering

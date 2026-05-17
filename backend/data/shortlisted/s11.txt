@@ -1,0 +1,15 @@
+Emily Davis
+AI Engineer
+
+Skills:
+Machine Learning, Python, TensorFlow, NLP, FastAPI
+
+Experience:
+AI Research Intern for 1 year.
+
+Projects:
+Resume classification using NLP.
+Speech recognition application.
+
+Education:
+M.Tech Artificial Intelligence

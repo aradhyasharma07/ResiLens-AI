@@ -1,0 +1,15 @@
+Ella Young
+Full Stack Engineer
+
+Skills:
+React, FastAPI, PostgreSQL, Git
+
+Experience:
+Full Stack Developer Intern.
+
+Projects:
+Real-time Collaboration Tool.
+AI Dashboard.
+
+Education:
+B.Tech CSE

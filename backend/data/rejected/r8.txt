@@ -1,0 +1,7 @@
+Computer Networks Notes
+
+OSI model explanation.
+TCP/IP layers.
+Routing algorithms.
+Semester 4 notes.
+Assignment questions included.

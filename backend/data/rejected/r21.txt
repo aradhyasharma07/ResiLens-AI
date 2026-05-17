@@ -1,0 +1,5 @@
+DBMS Unit Notes
+
+Normalization forms.
+ER diagrams.
+Database concepts.
