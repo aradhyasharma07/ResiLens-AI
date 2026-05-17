@@ -40,7 +40,8 @@ app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:3000"
+        "http://localhost:3000",
+        "https://resilens-ai-frontend.onrender.com",
     ],
     allow_credentials=True,
     allow_methods=["*"],
