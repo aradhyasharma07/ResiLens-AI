@@ -2,7 +2,14 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { FiMessageSquare, FiSend, FiX, FiLoader } from "react-icons/fi";
+import {
+  FiMessageSquare,
+  FiSend,
+  FiX,
+  FiLoader,
+} from "react-icons/fi";
+
+import ReactMarkdown from "react-markdown";
 
 type MessageRole = "assistant" | "user";
 
@@ -16,8 +23,11 @@ type ChatApiResponse = {
   error?: string;
 };
 
-const SESSION_STORAGE_OPEN_KEY = "recruiterAssistantOpen";
-const SESSION_STORAGE_MESSAGES_KEY = "recruiterAssistantMessages";
+const SESSION_STORAGE_OPEN_KEY =
+  "recruiterAssistantOpen";
+
+const SESSION_STORAGE_MESSAGES_KEY =
+  "recruiterAssistantMessages";
 
 const starterMessage: ChatMessage = {
   role: "assistant",
@@ -27,17 +37,38 @@ const starterMessage: ChatMessage = {
 
 export default function RecruiterAssistantChatbot() {
   const pathname = usePathname();
-  const shouldHideChatbot = pathname === "/" || pathname === "/login";
 
-  const [isOpen, setIsOpen] = useState(false);
-  const [input, setInput] = useState("");
-  const [isSending, setIsSending] = useState(false);
-  const [messages, setMessages] = useState<ChatMessage[]>([starterMessage]);
-  const containerRef = useRef<HTMLDivElement | null>(null);
+  const shouldHideChatbot =
+    pathname === "/" ||
+    pathname === "/login";
+
+  const [isOpen, setIsOpen] =
+    useState(false);
+
+  const [input, setInput] =
+    useState("");
+
+  const [isSending, setIsSending] =
+    useState(false);
+
+  const [messages, setMessages] =
+    useState<ChatMessage[]>([
+      starterMessage,
+    ]);
+
+  const containerRef =
+    useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    const savedOpen = sessionStorage.getItem(SESSION_STORAGE_OPEN_KEY);
-    const savedMessages = sessionStorage.getItem(SESSION_STORAGE_MESSAGES_KEY);
+    const savedOpen =
+      sessionStorage.getItem(
+        SESSION_STORAGE_OPEN_KEY
+      );
+
+    const savedMessages =
+      sessionStorage.getItem(
+        SESSION_STORAGE_MESSAGES_KEY
+      );
 
     if (savedOpen === "1") {
       setIsOpen(true);
@@ -45,8 +76,14 @@ export default function RecruiterAssistantChatbot() {
 
     if (savedMessages) {
       try {
-        const parsed = JSON.parse(savedMessages) as ChatMessage[];
-        if (Array.isArray(parsed) && parsed.length > 0) {
+        const parsed = JSON.parse(
+          savedMessages
+        ) as ChatMessage[];
+
+        if (
+          Array.isArray(parsed) &&
+          parsed.length > 0
+        ) {
           setMessages(parsed);
         }
       } catch {
@@ -56,16 +93,24 @@ export default function RecruiterAssistantChatbot() {
   }, []);
 
   useEffect(() => {
-    sessionStorage.setItem(SESSION_STORAGE_OPEN_KEY, isOpen ? "1" : "0");
+    sessionStorage.setItem(
+      SESSION_STORAGE_OPEN_KEY,
+      isOpen ? "1" : "0"
+    );
   }, [isOpen]);
 
   useEffect(() => {
-    sessionStorage.setItem(SESSION_STORAGE_MESSAGES_KEY, JSON.stringify(messages));
+    sessionStorage.setItem(
+      SESSION_STORAGE_MESSAGES_KEY,
+      JSON.stringify(messages)
+    );
   }, [messages]);
 
   useEffect(() => {
     if (!containerRef.current) return;
-    containerRef.current.scrollTop = containerRef.current.scrollHeight;
+
+    containerRef.current.scrollTop =
+      containerRef.current.scrollHeight;
   }, [messages, isOpen]);
 
   const quickPrompts = useMemo(
@@ -79,16 +124,26 @@ export default function RecruiterAssistantChatbot() {
   );
 
   const getChatContext = () => {
-    const latestRaw = localStorage.getItem("latestResult");
-    const historyRaw = localStorage.getItem("resumeHistory");
+    const latestRaw =
+      localStorage.getItem(
+        "latestResult"
+      );
+
+    const historyRaw =
+      localStorage.getItem(
+        "resumeHistory"
+      );
 
     let latestResult: unknown = null;
+
     let shortlistedCount = 0;
+
     let rejectedCount = 0;
 
     if (latestRaw) {
       try {
-        latestResult = JSON.parse(latestRaw);
+        latestResult =
+          JSON.parse(latestRaw);
       } catch {
         latestResult = null;
       }
@@ -96,9 +151,25 @@ export default function RecruiterAssistantChatbot() {
 
     if (historyRaw) {
       try {
-        const parsedHistory = JSON.parse(historyRaw) as Array<{ result?: string }>;
-        shortlistedCount = parsedHistory.filter((item) => item.result === "Shortlisted").length;
-        rejectedCount = parsedHistory.filter((item) => item.result === "Rejected").length;
+        const parsedHistory = JSON.parse(
+          historyRaw
+        ) as Array<{
+          result?: string;
+        }>;
+
+        shortlistedCount =
+          parsedHistory.filter(
+            (item) =>
+              item.result ===
+              "Shortlisted"
+          ).length;
+
+        rejectedCount =
+          parsedHistory.filter(
+            (item) =>
+              item.result ===
+              "Rejected"
+          ).length;
       } catch {
         shortlistedCount = 0;
         rejectedCount = 0;
@@ -112,43 +183,71 @@ export default function RecruiterAssistantChatbot() {
     };
   };
 
-  const sendMessage = async (rawMessage: string) => {
-    const message = rawMessage.trim();
-    if (!message || isSending) return;
+  const sendMessage = async (
+    rawMessage: string
+  ) => {
+    const message =
+      rawMessage.trim();
 
-    const userMessage: ChatMessage = {
-      role: "user",
-      content: message,
-    };
+    if (!message || isSending)
+      return;
 
-    const nextMessages = [...messages, userMessage];
+    const userMessage: ChatMessage =
+      {
+        role: "user",
+        content: message,
+      };
+
+    const nextMessages = [
+      ...messages,
+      userMessage,
+    ];
+
     setMessages(nextMessages);
+
     setInput("");
+
     setIsSending(true);
 
     try {
-      const response = await fetch("http://127.0.0.1:8000/chat", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          message,
-          history: nextMessages,
-          context: getChatContext(),
-        }),
-      });
+      const response =
+        await fetch(
+          "http://127.0.0.1:8000/chat",
+          {
+            method: "POST",
 
-      const data = (await response.json()) as ChatApiResponse;
+            headers: {
+              "Content-Type":
+                "application/json",
+            },
 
-      if (!response.ok || data.error) {
+            body: JSON.stringify({
+              message,
+
+              history:
+                nextMessages.slice(-6),
+
+              context:
+                getChatContext(),
+            }),
+          }
+        );
+
+      const data =
+        (await response.json()) as ChatApiResponse;
+
+      if (
+        !response.ok ||
+        data.error
+      ) {
         setMessages((prev) => [
           ...prev,
           {
             role: "assistant",
+
             content:
               data.error ||
-              "I could not process that right now. Please check backend connection and try again.",
+              "I could not process that request right now.",
           },
         ]);
       } else {
@@ -156,9 +255,10 @@ export default function RecruiterAssistantChatbot() {
           ...prev,
           {
             role: "assistant",
+
             content:
               data.reply ||
-              "I could not generate a response. Please try a more specific question.",
+              "No response generated.",
           },
         ]);
       }
@@ -167,8 +267,9 @@ export default function RecruiterAssistantChatbot() {
         ...prev,
         {
           role: "assistant",
+
           content:
-            "Unable to reach recruiter assistant backend. Ensure FastAPI server is running.",
+            "Unable to connect to recruiter assistant backend.",
         },
       ]);
     } finally {
@@ -176,10 +277,13 @@ export default function RecruiterAssistantChatbot() {
     }
   };
 
-  return shouldHideChatbot ? null : (
-    <div className="fixed bottom-6 right-6 z-1200">
+  if (shouldHideChatbot)
+    return null;
+
+  return (
+    <div className="fixed bottom-6 right-6 z-[1200]">
       <div
-        className={`mb-4 w-90 max-w-[calc(100vw-2rem)] origin-bottom-right transition-all duration-300 ease-out ${
+        className={`mb-4 w-[380px] max-w-[calc(100vw-2rem)] origin-bottom-right transition-all duration-300 ease-out ${
           isOpen
             ? "translate-y-0 scale-100 opacity-100 pointer-events-auto"
             : "translate-y-6 scale-95 opacity-0 pointer-events-none"
@@ -187,31 +291,114 @@ export default function RecruiterAssistantChatbot() {
       >
         <div className="overflow-hidden rounded-[26px] border border-black/10 bg-[#fcfcf8] shadow-[0_24px_80px_rgba(17,17,16,0.14)] backdrop-blur-sm">
           <div className="bg-black px-5 py-4 text-white">
-            <p className="text-sm uppercase tracking-[0.18em] text-[#9ad3b8]">Recruiter Assistant</p>
-            <h3 className="hero-title text-3xl leading-none">🤖 ResiL Bot</h3>
+            <p className="text-sm uppercase tracking-[0.18em] text-[#9ad3b8]">
+              Recruiter Assistant
+            </p>
+
+            <h3 className="hero-title text-3xl leading-none">
+              🤖 ResiL Bot
+            </h3>
           </div>
 
-          <div ref={containerRef} className="max-h-95 space-y-4 overflow-y-auto px-4 py-4">
-            {messages.map((msg, idx) => (
-              <div
-                key={`${msg.role}-${idx}`}
-                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-              >
+          <div
+            ref={containerRef}
+            className="max-h-[500px] space-y-4 overflow-y-auto px-4 py-4"
+          >
+            {messages.map(
+              (msg, idx) => (
                 <div
-                  className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                  key={`${msg.role}-${idx}`}
+                  className={`flex ${
                     msg.role === "user"
-                      ? "rounded-br-md bg-[#1c6b4a] text-white"
-                      : "rounded-bl-md border border-black/10 bg-white text-[#1f1f1c]"
+                      ? "justify-end"
+                      : "justify-start"
                   }`}
                 >
-                  {msg.content}
+                  <div
+                    className={`max-w-[85%] rounded-2xl px-4 py-3 text-sm leading-relaxed ${
+                      msg.role ===
+                      "user"
+                        ? "rounded-br-md bg-[#1c6b4a] text-white"
+                        : "rounded-bl-md border border-black/10 bg-white text-[#1f1f1c]"
+                    }`}
+                  >
+                    <ReactMarkdown
+                      components={{
+                        p: ({
+                          children,
+                        }) => (
+                          <p className="mb-2 leading-7">
+                            {
+                              children
+                            }
+                          </p>
+                        ),
+
+                        strong: ({
+                          children,
+                        }) => (
+                          <strong className="font-semibold text-black">
+                            {
+                              children
+                            }
+                          </strong>
+                        ),
+
+                        ul: ({
+                          children,
+                        }) => (
+                          <ul className="mb-2 ml-4 list-disc">
+                            {
+                              children
+                            }
+                          </ul>
+                        ),
+
+                        ol: ({
+                          children,
+                        }) => (
+                          <ol className="mb-2 ml-4 list-decimal">
+                            {
+                              children
+                            }
+                          </ol>
+                        ),
+
+                        li: ({
+                          children,
+                        }) => (
+                          <li className="mb-1">
+                            {
+                              children
+                            }
+                          </li>
+                        ),
+
+                        code: ({
+                          children,
+                        }) => (
+                          <code className="rounded bg-black/5 px-1 py-0.5 text-xs">
+                            {
+                              children
+                            }
+                          </code>
+                        ),
+                      }}
+                    >
+                      {msg.content}
+                    </ReactMarkdown>
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            )}
+
             {isSending && (
               <div className="flex justify-start">
                 <div className="inline-flex items-center gap-2 rounded-2xl rounded-bl-md border border-black/10 bg-white px-4 py-3 text-sm text-[#4b4b4a]">
-                  <FiLoader className="animate-spin" />
+                  <span className="animate-spin">
+                    <FiLoader />
+                  </span>
+
                   Thinking...
                 </div>
               </div>
@@ -220,37 +407,63 @@ export default function RecruiterAssistantChatbot() {
 
           <div className="border-t border-black/5 px-4 py-3">
             <div className="mb-3 flex gap-2 overflow-x-auto pb-1">
-              {quickPrompts.map((prompt) => (
-                <button
-                  key={prompt}
-                  type="button"
-                  onClick={() => sendMessage(prompt)}
-                  disabled={isSending}
-                  className="whitespace-nowrap rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs text-[#444] hover:border-[#1c6b4a] hover:text-[#1c6b4a] disabled:cursor-not-allowed disabled:opacity-50"
-                >
-                  {prompt}
-                </button>
-              ))}
+              {quickPrompts.map(
+                (prompt) => (
+                  <button
+                    key={prompt}
+                    type="button"
+                    onClick={() =>
+                      sendMessage(
+                        prompt
+                      )
+                    }
+                    disabled={
+                      isSending
+                    }
+                    className="whitespace-nowrap rounded-full border border-black/10 bg-white px-3 py-1.5 text-xs text-[#444] hover:border-[#1c6b4a] hover:text-[#1c6b4a] disabled:cursor-not-allowed disabled:opacity-50"
+                  >
+                    {prompt}
+                  </button>
+                )
+              )}
             </div>
 
             <div className="flex items-center gap-2 rounded-2xl border border-black/10 bg-white px-3 py-2">
               <input
                 type="text"
                 value={input}
-                onChange={(e) => setInput(e.target.value)}
+                onChange={(e) =>
+                  setInput(
+                    e.target.value
+                  )
+                }
                 onKeyDown={(e) => {
-                  if (e.key === "Enter") {
+                  if (
+                    e.key ===
+                    "Enter"
+                  ) {
                     e.preventDefault();
-                    void sendMessage(input);
+
+                    void sendMessage(
+                      input
+                    );
                   }
                 }}
                 placeholder="Ask about candidate quality, fit, or interview strategy..."
                 className="w-full bg-transparent text-sm outline-none placeholder:text-[#8b8b88]"
               />
+
               <button
                 type="button"
-                onClick={() => void sendMessage(input)}
-                disabled={isSending || !input.trim()}
+                onClick={() =>
+                  void sendMessage(
+                    input
+                  )
+                }
+                disabled={
+                  isSending ||
+                  !input.trim()
+                }
                 className="grid h-9 w-9 place-items-center rounded-full bg-black text-white disabled:cursor-not-allowed disabled:opacity-50"
               >
                 <FiSend />
@@ -262,12 +475,29 @@ export default function RecruiterAssistantChatbot() {
 
       <button
         type="button"
-        onClick={() => setIsOpen((prev) => !prev)}
+        onClick={() =>
+          setIsOpen(
+            (prev) => !prev
+          )
+        }
         className="group ml-auto flex h-16 w-16 items-center justify-center rounded-full bg-black text-white shadow-[0_14px_40px_rgba(17,17,16,0.28)] transition-all duration-300 hover:scale-105"
-        aria-label={isOpen ? "Close recruiter assistant" : "Open recruiter assistant"}
+        aria-label={
+          isOpen
+            ? "Close recruiter assistant"
+            : "Open recruiter assistant"
+        }
       >
         <span className="absolute h-16 w-16 rounded-full border border-[#1c6b4a]/40 opacity-80 transition-transform duration-500 group-hover:scale-125" />
-        {isOpen ? <FiX className="relative text-2xl" /> : <FiMessageSquare className="relative text-2xl" />}
+
+        {isOpen ? (
+          <span className="relative text-2xl">
+            <FiX />
+          </span>
+        ) : (
+          <span className="relative text-2xl">
+            <FiMessageSquare />
+          </span>
+        )}
       </button>
     </div>
   );

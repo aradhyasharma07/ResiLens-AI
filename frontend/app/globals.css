@@ -1,26 +1,165 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #F8F7F4;
+  --foreground: #111110;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-outfit), sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+/* Luxury Heading */
+.hero-title {
+  font-family: var(--font-cormorant), serif;
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+/* Logo Font */
+.luxury-font {
+  font-family: var(--font-cormorant), serif;
+  font-style: italic;
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+/* Mono Font */
+.mono-font {
+  font-family: var(--font-mono), monospace;
+}
+
+/* =========================
+   PREMIUM GRID BACKGROUND
+========================= */
+
+.grid-background {
+  position: relative;
+  background-color: #F8F7F4;
+  overflow: hidden;
+}
+
+.grid-background::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  background-image:
+    linear-gradient(
+      rgba(17, 17, 16, 0.05) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(17, 17, 16, 0.05) 1px,
+      transparent 1px
+    );
+
+  background-size: 60px 60px;
+}
+
+/* Soft luxury glow */
+.grid-background::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+
+  background:
+    radial-gradient(
+      circle at 20% 20%,
+      rgba(28, 107, 74, 0.06),
+      transparent 30%
+    ),
+    radial-gradient(
+      circle at 80% 70%,
+      rgba(28, 107, 74, 0.04),
+      transparent 30%
+    );
+}
+
+/* Make content appear above grid */
+.content-layer {
+  position: relative;
+  z-index: 2;
+}
+
+/* Smooth animation */
+@keyframes bgMove {
+  0% {
+    transform: translate(0px, 0px);
+  }
+
+  50% {
+    transform: translate(-20px, 20px);
+  }
+
+  100% {
+    transform: translate(0px, 0px);
+  }
+}
+
+.animate-bgMove {
+  animation: bgMove 8s ease-in-out infinite;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1efe9;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cfc9bd;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #b8b1a2;
+}
+
+/* Input cleanup */
+input,
+textarea,
+button {
+  outline: none;
+}
+
+/* Selection */
+::selection {
+  background: rgba(28, 107, 74, 0.18);
+}
+
+/* Smooth transitions */
+* {
+  transition: all 0.2s ease;
+}
+
+button,
+a,
+[role="button"],
+input[type="submit"],
+input[type="button"],
+.clickable {
+  cursor: pointer;
+}
+
+button,
+a {
+  transition: all 0.1s ease;
 }

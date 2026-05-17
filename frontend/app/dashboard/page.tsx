@@ -1,206 +1,647 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
-import { FaUserCircle, FaUpload } from "react-icons/fa";
-import router from "next/router";
+export default function DashboardPage() {
+  const router = useRouter();
 
-export default function Dashboard() {
-const router = useRouter();
-useEffect(() => 
-    {const loggedIn = 
-        localStorage.getItem("loggedIn");
-        if (!loggedIn) {
-            router.push("/login");
-}
-},[]);
+  const [selectedMode, setSelectedMode] =
+    useState("standard");
 
-const [file, setFile] = useState<File | null>(null);
-const [preview, setPreview] = useState<string>("");
+  const [jobDescription, setJobDescription] =
+    useState("");
 
-const [result, setResult] = useState<string | null>(null);
-const [confidence, setConfidence] = useState<number>(0);
+  const [file, setFile] =
+    useState<File | null>(null);
 
-const logout = () => {
-localStorage.removeItem("isLoggedIn");
-router.push("/login");
-};
+  const [loading, setLoading] =
+    useState(false);
 
-const handleUpload = async () => {
-if (!file) {
-alert("Please select a file first");
-return;
-}
+  const [progress, setProgress] =
+    useState(0);
 
-try {
-  const formData = new FormData();
-  formData.append("file", file);
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
 
-  const res = await fetch("http://localhost:8000/predict-file", {
-    method: "POST",
-    body: formData,
-  });
+    if (loading) {
+      interval = setInterval(() => {
+        setProgress((prev) => {
+          if (prev >= 90) {
+            return prev;
+          }
 
-  const data = await res.json();
+          return prev + 10;
+        });
+      }, 400);
+    }
 
-  setPreview(data.text_preview || "No preview available");
-  setResult(data.result);
-  setConfidence(data.confidence);
+    return () => clearInterval(interval);
+  }, [loading]);
 
-  const history = JSON.parse(localStorage.getItem("history") || "[]");
+  const handleAnalyze = async () => {
+    if (!file) {
+      alert(
+        "Please upload a resume first"
+      );
 
-history.unshift({
-name: file.name,
-result: data.result,
-confidence: data.confidence,
-time: new Date().toLocaleString(),
-});
+      return;
+    }
 
-localStorage.setItem("history", JSON.stringify(history));
-} catch (error) {
-  alert("Error connecting to backend");
-}
+    if (!jobDescription.trim()) {
+      alert(
+        "Please paste the job description"
+      );
 
-};
+      return;
+    }
 
-return (
-<main className="min-h-screen bg-linear-to-br from-black via-indigo-950 to-purple-950 text-white">
+    setLoading(true);
 
-  {/* Navbar */}
-  <nav className="flex items-center justify-between px-8 py-4 bg-white/5 backdrop-blur border-b border-white/10">
+    setProgress(10);
 
-    <h1 className="text-2xl font-bold bg-linear-to-r from-indigo-400 to-purple-500 bg-clip-text text-transparent">
-      ResiLens AI
-    </h1>
+    const formData = new FormData();
 
-    <div className="flex items-center gap-8 font-medium text-gray-300">
+    formData.append("file", file);
 
-      <button className="hover:text-white transition">
-        Dashboard
-      </button>
+    formData.append(
+      "job_description",
+      jobDescription
+    );
 
-      <button
-        onClick={() => router.push("/history")}
-        className="hover:text-white transition"
-      >
-        History
-      </button>
+    formData.append(
+      "analysis_mode",
+      selectedMode
+    );
 
-      <button className="flex items-center gap-2 hover:text-white transition">
-        <FaUserCircle size={20} />
-        Profile
-      </button>
+    try {
+      const response = await fetch(
+        "http://127.0.0.1:8000/analyze",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
-      <button
-        onClick={logout}
-        className="bg-red-500/80 hover:bg-red-600 px-4 py-1 rounded-lg text-white transition"
-      >
-        Logout
-      </button>
-    </div>
-  </nav>
+      const data =
+        await response.json();
 
-  {/* Main Grid */}
-  <section className="grid grid-cols-2 gap-8 p-10">
+      if (!response.ok) {
+        alert(
+          data.detail ||
+            "Analysis failed"
+        );
 
-{/* Upload Panel */}
-<div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6 shadow-xl">
+        setLoading(false);
 
-  <h2 className="text-xl font-semibold mb-4">
-    Upload Resume
-  </h2>
+        setProgress(0);
 
-  <div className="h-[280px] border border-dashed border-white/20 rounded-xl flex flex-col items-center justify-center text-center gap-4 hover:border-indigo-500/50 transition">
-
-    <FaUpload className="text-5xl text-gray-400" />
-
-    {/* Hidden file input */}
-    <input
-      id="resumeUpload"
-      type="file"
-      accept=".pdf,.txt"
-      onChange={(e) =>
-        setFile(e.target.files ? e.target.files[0] : null)
+        return;
       }
-      className="hidden"
-    />
 
-    {/* Custom Choose File button */}
-    <label
-      htmlFor="resumeUpload"
-      className="cursor-pointer bg-indigo-600 hover:bg-indigo-700 px-6 py-2 rounded-lg shadow font-medium transition"
-    >
-      Choose File
-    </label>
+      setProgress(100);
 
-    {/* File name display */}
-    <p className="text-sm text-gray-400">
-      {file ? file.name : "No file chosen"}
-    </p>
+      localStorage.setItem(
+        "latestResult",
+        JSON.stringify(data)
+      );
 
-    {/* Analyze button */}
-    <button
-      onClick={handleUpload}
-      className="bg-indigo-600 hover:bg-indigo-700 px-6 py-2 rounded-lg transition shadow font-medium"
-    >
-      Analyze Resume
-    </button>
+      setTimeout(() => {
+        router.push("/results");
+      }, 500);
 
-  </div>
+    } catch (error) {
+      console.error(error);
 
-</div>
+      alert(
+        "Backend not running or failed to connect"
+      );
 
+      setLoading(false);
 
+      setProgress(0);
+    }
+  };
 
-    {/* Preview Panel */}
-    <div className="bg-white/5 backdrop-blur border border-white/10 rounded-2xl p-6 shadow-xl">
+  return (
+    <main className="min-h-screen bg-[#F7F5F0] text-[#111111]">
 
-      <h2 className="text-xl font-semibold mb-4">
-        Resume Preview
-      </h2>
+      {/* LOADING OVERLAY */}
 
-      {/* Result + Confidence */}
-      {result && (
-        <div className="mb-4">
+      {loading && (
 
-          <div
-            className={`px-4 py-2 rounded-lg font-semibold text-center mb-2 ${
-              result === "Shortlisted"
-                ? "bg-green-500/20 text-green-400"
-                : result === "Needs Review"
-                ? "bg-yellow-500/20 text-yellow-400"
-                : "bg-red-500/20 text-red-400"
-            }`}
-          >
-            {result}
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-[#F7F5F0]/80 backdrop-blur-md">
+
+          <div className="w-[420px] rounded-[32px] border border-black/10 bg-white p-10 shadow-2xl">
+
+            <div className="mb-6 flex items-center gap-4">
+
+              <div className="flex h-14 w-14 animate-pulse items-center justify-center rounded-2xl bg-[#176B47] text-2xl text-white">
+                🤖
+              </div>
+
+              <div>
+
+                <h2 className="hero-title text-[32px] leading-none">
+                  Analyzing Resume
+                </h2>
+
+                <p className="mt-2 text-sm text-[#7A746B]">
+                  AI is processing candidate profile...
+                </p>
+
+              </div>
+
+            </div>
+
+            <div className="mb-4 h-3 overflow-hidden rounded-full bg-[#ECE7DD]">
+
+              <div
+                className="h-full rounded-full bg-[#176B47] transition-all duration-300"
+                style={{
+                  width: `${progress}%`,
+                }}
+              />
+
+            </div>
+
+            <div className="flex items-center justify-between text-sm text-[#7A746B]">
+
+              <span>
+                Processing
+              </span>
+
+              <span>
+                {progress}%
+              </span>
+
+            </div>
+
+            <div className="mt-8 space-y-3 text-sm text-[#8D877F]">
+
+              <div className="flex items-center gap-3">
+
+                <span className="text-[#176B47]">
+                  ✓
+                </span>
+
+                Resume uploaded
+
+              </div>
+
+              <div className="flex items-center gap-3">
+
+                <span className="animate-pulse text-[#176B47]">
+                  ●
+                </span>
+
+                Extracting skills and experience
+
+              </div>
+
+              <div className="flex items-center gap-3">
+
+                <span className="animate-pulse text-[#176B47]">
+                  ●
+                </span>
+
+                Generating AI recruiter insights
+
+              </div>
+
+            </div>
+
           </div>
-
-          <div className="w-full bg-white/10 rounded-full h-3 overflow-hidden">
-            <div
-              className="h-full bg-linear-to-r from-indigo-500 to-purple-500 transition-all duration-700"
-              style={{ width: `${confidence}%` }}
-            />
-          </div>
-
-          <p className="text-sm text-gray-400 mt-1 text-center">
-            Confidence: {confidence}%
-          </p>
 
         </div>
+
       )}
 
-      {/* Preview Text */}
-      <div className="h-62.5 overflow-y-auto border border-white/20 rounded-xl p-4 text-gray-300 whitespace-pre-wrap">
+      {/* NAVBAR */}
 
-        {preview || "Preview will appear here after upload..."}
+      <nav className="sticky top-0 z-50 w-full border-b border-black/5 bg-[#F7F5F0]/95 backdrop-blur-md">
 
-      </div>
+        <div className="mx-auto flex max-w-[1400px] items-center justify-between px-8 py-5">
 
-    </div>
+          <div
+            onClick={() =>
+              router.push("/")
+            }
+            className="luxury-font cursor-pointer text-[38px]"
+          >
+            ResiLens
+            <span className="text-[#176B47]">
+              .AI
+            </span>
+          </div>
 
-  </section>
-</main>
+          <div className="hidden items-center gap-10 text-[14px] text-[#7A746B] md:flex">
 
-);
+            <button
+              onClick={() =>
+                router.push("/")
+              }
+              className="cursor-pointer transition hover:text-black"
+            >
+              Home
+            </button>
+
+            <button className="cursor-pointer transition hover:text-black">
+              Analyze
+            </button>
+
+            <button
+              onClick={() =>
+                router.push(
+                  "/history"
+                )
+              }
+              className="cursor-pointer transition hover:text-black"
+            >
+              History
+            </button>
+
+            <button
+              onClick={() =>
+                router.push(
+                  "/profile"
+                )
+              }
+              className="cursor-pointer transition hover:text-black"
+            >
+              Profile
+            </button>
+
+          </div>
+
+          <button
+            onClick={() =>
+              router.push("/profile")
+            }
+            className="cursor-pointer rounded-full bg-black px-8 py-3 text-sm font-medium text-white transition hover:scale-[1.02]"
+          >
+            Profile
+          </button>
+
+        </div>
+
+      </nav>
+
+      <section className="mx-auto max-w-[900px] px-8 py-16">
+
+        {/* STEPPER */}
+
+        <div className="mb-16 flex items-center gap-4">
+
+          <div className="flex items-center gap-3">
+
+            <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#176B47] text-xs font-medium text-white">
+              1
+            </div>
+
+            <span className="text-[15px] font-medium text-[#176B47]">
+              Upload
+            </span>
+
+          </div>
+
+          <div className="h-[1px] w-12 bg-[#D9D4CA]" />
+
+          <div className="flex items-center gap-3">
+
+            <div className="flex h-7 w-7 items-center justify-center rounded-full border border-[#D9D4CA] text-xs text-[#A9A39A]">
+              2
+            </div>
+
+            <span className="text-[15px] text-[#A9A39A]">
+              Configure
+            </span>
+
+          </div>
+
+          <div className="h-[1px] w-12 bg-[#D9D4CA]" />
+
+          <div className="flex items-center gap-3">
+
+            <div className="flex h-7 w-7 items-center justify-center rounded-full border border-[#D9D4CA] text-xs text-[#A9A39A]">
+              3
+            </div>
+
+            <span className="text-[15px] text-[#A9A39A]">
+              Analyze
+            </span>
+
+          </div>
+
+        </div>
+
+        {/* TITLE */}
+
+        <h1 className="hero-title mb-5 text-[64px] leading-none">
+          Analyze a resume
+        </h1>
+
+        <p className="mb-14 text-[18px] leading-relaxed text-[#8D877F]">
+          Upload a resume below.
+          Add a job description
+          for a targeted match
+          score and skill gap
+          analysis.
+        </p>
+
+        {/* DROP AREA */}
+
+        <div className="group relative mb-14 overflow-hidden rounded-[36px] border border-dashed border-[#DDD7CD] bg-white/70 p-14 transition-all duration-300 hover:border-[#176B47]/40 hover:bg-white">
+
+          <div className="flex flex-col items-center justify-center text-center">
+
+            <div className="mb-8 flex h-24 w-24 items-center justify-center rounded-full bg-[#F4F1EA] shadow-sm transition-transform duration-300 group-hover:scale-105">
+
+              <span className="text-4xl">
+                📄
+              </span>
+
+            </div>
+
+            <h2 className="hero-title text-[52px] leading-none text-[#111111]">
+              Drop resume here
+            </h2>
+
+            <p className="mt-4 text-[18px] text-[#8D877F]">
+              Upload PDF, DOCX,
+              TXT or DOC files up
+              to 10 MB
+            </p>
+
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+
+              {[
+                "PDF",
+                "DOCX",
+                "TXT",
+                "DOC",
+              ].map((type) => (
+
+                <div
+                  key={type}
+                  className="rounded-2xl border border-[#DDD7CD] bg-[#FAF8F4] px-5 py-2 text-sm font-medium text-[#7A746B]"
+                >
+                  {type}
+                </div>
+
+              ))}
+
+            </div>
+
+            <div className="mt-10">
+
+              {!file ? (
+
+                <label className="cursor-pointer">
+
+                  <input
+                    type="file"
+                    accept=".pdf,.doc,.docx,.txt"
+                    className="hidden"
+                    onChange={(e) =>
+                      setFile(
+                        e.target
+                          .files
+                          ? e.target
+                              .files[0]
+                          : null
+                      )
+                    }
+                  />
+
+                  <div className="inline-flex cursor-pointer items-center gap-3 rounded-2xl bg-black px-8 py-4 text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:bg-[#1c1c1a]">
+
+                    <span className="text-[17px] font-medium">
+                      Upload
+                      Resume
+                    </span>
+
+                  </div>
+
+                </label>
+
+              ) : (
+
+                <div className="flex items-center gap-5 rounded-2xl border border-[#176B47]/20 bg-[#F4FBF7] px-6 py-5 shadow-sm">
+
+                  <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-2xl shadow-sm">
+                    📄
+                  </div>
+
+                  <div className="flex flex-col text-left">
+
+                    <span className="max-w-[280px] truncate text-[15px] font-semibold text-[#111111]">
+
+                      {file.name}
+
+                    </span>
+
+                    <span className="text-sm text-[#6F6F69]">
+
+                      {(
+                        file.size /
+                        1024 /
+                        1024
+                      ).toFixed(2)}{" "}
+                      MB
+
+                    </span>
+
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setFile(null)
+                    }
+                    className="flex h-9 w-9 cursor-pointer items-center justify-center rounded-full bg-red-50 text-red-500 transition-all duration-200 hover:scale-105 hover:bg-red-100"
+                  >
+                    ✕
+                  </button>
+
+                </div>
+
+              )}
+
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* JOB DESCRIPTION */}
+
+        <div className="mb-14">
+
+          <div className="mb-2 flex items-center gap-3">
+
+            <label className="text-[20px] font-medium">
+
+              Job description
+
+            </label>
+
+          </div>
+
+          <p className="mb-5 text-sm text-[#8D877F]">
+
+            Paste the JD to get a
+            targeted skill gap
+            analysis and semantic
+            match score.
+
+          </p>
+
+          <textarea
+            rows={7}
+            value={jobDescription}
+            onChange={(e) =>
+              setJobDescription(
+                e.target.value
+              )
+            }
+            placeholder="Paste the full job description here — requirements, responsibilities, and preferred qualifications..."
+            className="w-full resize-none rounded-[24px] border border-[#DDD7CD] bg-white px-6 py-5 text-[16px] outline-none transition focus:border-[#176B47]"
+          />
+
+        </div>
+
+        {/* ANALYSIS DEPTH */}
+
+        <div className="mb-14">
+
+          <h3 className="mb-5 text-[20px] font-medium">
+
+            Analysis depth
+
+          </h3>
+
+          <div className="grid gap-5 md:grid-cols-2">
+
+            <div
+              onClick={() =>
+                setSelectedMode(
+                  "standard"
+                )
+              }
+              className={`cursor-pointer rounded-[24px] border p-7 transition-all duration-300 ${
+                selectedMode ===
+                "standard"
+                  ? "border-[#176B47] bg-[#F4FBF7]"
+                  : "border-[#DDD7CD] bg-white hover:border-[#176B47]/30"
+              }`}
+            >
+
+              <div className="mb-4 flex items-start justify-between">
+
+                <h4 className="hero-title text-[30px]">
+
+                  Standard
+
+                </h4>
+
+                <div
+                  className={`flex h-7 w-7 items-center justify-center rounded-full border ${
+                    selectedMode ===
+                    "standard"
+                      ? "border-[#176B47] bg-[#176B47] text-white"
+                      : "border-[#DDD7CD]"
+                  }`}
+                >
+                  {selectedMode ===
+                  "standard"
+                    ? "✓"
+                    : ""}
+                </div>
+
+              </div>
+
+              <p className="leading-relaxed text-[#7A746B]">
+
+                Skills extraction,
+                experience scoring,
+                education, and
+                match summary.
+
+              </p>
+
+            </div>
+
+            <div
+              onClick={() =>
+                setSelectedMode(
+                  "deep"
+                )
+              }
+              className={`cursor-pointer rounded-[24px] border p-7 transition-all duration-300 ${
+                selectedMode ===
+                "deep"
+                  ? "border-[#176B47] bg-[#F4FBF7]"
+                  : "border-[#DDD7CD] bg-white hover:border-[#176B47]/30"
+              }`}
+            >
+
+              <div className="mb-4 flex items-start justify-between">
+
+                <h4 className="hero-title text-[30px]">
+
+                  Deep analysis
+
+                </h4>
+
+                <div
+                  className={`flex h-7 w-7 items-center justify-center rounded-full border ${
+                    selectedMode ===
+                    "deep"
+                      ? "border-[#176B47] bg-[#176B47] text-white"
+                      : "border-[#DDD7CD]"
+                  }`}
+                >
+                  {selectedMode ===
+                  "deep"
+                    ? "✓"
+                    : ""}
+                </div>
+
+              </div>
+
+              <p className="leading-relaxed text-[#7A746B]">
+
+                Everything in
+                Standard + AI
+                narrative, skill gap
+                map, and hiring
+                recommendations.
+
+              </p>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        {/* RUN ANALYSIS */}
+
+        <button
+          onClick={handleAnalyze}
+          disabled={loading}
+          className="cursor-pointer rounded-full bg-[#176B47] px-10 py-5 text-lg font-medium text-white shadow-lg transition-all duration-300 hover:scale-[1.02] hover:bg-[#14563a] disabled:cursor-not-allowed disabled:opacity-70"
+        >
+
+          {loading
+            ? "Running Analysis..."
+            : "Run analysis"}
+
+        </button>
+
+      </section>
+
+    </main>
+  );
 }
