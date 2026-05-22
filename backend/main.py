@@ -276,10 +276,10 @@ def predict_resume_ml(
 
         confidence = float(
             round(
-                shortlisted_prob * 100,
+                min(shortlisted_prob * 120, 99),
                 2
+                )
             )
-        )
 
     else:
 
