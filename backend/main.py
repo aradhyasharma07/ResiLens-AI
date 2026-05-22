@@ -17,7 +17,7 @@ from typing import Optional
 
 import os
 import io
-import re
+# import re
 import uuid
 import certifi
 import pickle
@@ -268,7 +268,7 @@ def predict_resume_ml(
         proba[0]
     )
 
-    if shortlisted_prob >= 0.75:
+    if shortlisted_prob >= 0.65:
 
         prediction = (
             "Shortlisted"
