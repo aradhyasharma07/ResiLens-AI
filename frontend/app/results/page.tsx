@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import React from "react";
+import ReactMarkdown from "react-markdown";
 
 export default function ResultsPage() {
   const router = useRouter();
@@ -186,18 +188,22 @@ export default function ResultsPage() {
                 AI Recruiter Feedback
               </h2>
 
-              <div className="bg-[#FAFAF7] rounded-[24px] p-8 whitespace-pre-wrap text-gray-700 leading-relaxed border border-black/5">
-
-                {data.feedback &&
-                data.feedback.trim() !== ""
-                  ? data.feedback
-                  : "AI recruiter feedback unavailable."}
-
-              </div>
-
-            </div>
-
-          </div>
+              <div className="bg-[#FAFAF7] rounded-[24px] p-8 text-gray-700 leading-relaxed border border-black/5">
+              {data.feedback &&
+              data.feedback.trim() !== "" ? (
+              
+              <div className="prose max-w-none">
+                <ReactMarkdown>
+                  {data.feedback}
+                  </ReactMarkdown>
+                  
+                  </div>
+                  ) : (
+                    "AI recruiter feedback unavailable."
+                    )}
+                    </div>
+                    </div>
+                    </div>
 
           {/* RIGHT SIDE */}
           <div className="space-y-8">
