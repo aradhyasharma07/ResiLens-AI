@@ -268,23 +268,10 @@ def predict_resume_ml(
         proba[0]
     )
 
-    if shortlisted_prob >= 0.65:
+    if shortlisted_prob >= 0.50:
 
         prediction = (
             "Shortlisted"
-        )
-
-        confidence = float(
-            round(
-                shortlisted_prob * 100,
-                2
-            )
-        )
-
-    elif shortlisted_prob >= 0.50:
-
-        prediction = (
-            "Needs Review"
         )
 
         confidence = float(
